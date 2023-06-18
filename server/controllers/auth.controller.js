@@ -18,7 +18,7 @@ const accessTokenExpiryTime = process.env.ACCESS_TOKEN_EXPIRY_TIME;
  */
 export async function postSignup(req, res, next) {
   try {
-    console.log('hi')
+    console.log('hi');
     // Extract data from the request body
     const { name, email, password, confirmPassword, gender } = req.body;
 
@@ -124,4 +124,44 @@ export async function postLogin(req, res, next) {
     console.log('Error in postLogin', error);
     return res.status(500).json({ error: 'INTERNAL SERVER ERROR WHILE LOGGING IN.' });
   }
+}
+
+/**
+ * Handle the logout process.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<void>} - A promise that resolves when the logout process is complete.
+ */
+export async function postLogout(req, res, next) {
+  // Extract the access token from the request headers
+  const accessToken = req.headers['authorization'];
+
+  // If access token is not found, return an error response
+  if (!accessToken) {
+    return res.status(400).json({ message: 'Access Token not found. User might have been logged out already.' });
+  }
+
+  // Verify the access token
+  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET_KEY ?? '', async (error, decoded) => {
+    // If the access token is invalid, return an error response
+    if (error) {
+      return res.status(403).json({ message: 'INVALID TOKEN' });
+    }
+
+    try {
+      const { userId } = decoded;
+
+      // Delete the corresponding access token and refresh token from the database
+      await AccessToken.findOneAndDelete({ userId });
+      await RefreshToken.findOneAndDelete({ userId });
+
+      // Return a success response indicating successful logout
+      return res.status(200).json({ message: 'User logged out successfully.' });
+    } catch (err) {
+      console.log('Error in postLogout:', err);
+      return res.status(500).json({ error: 'INTERNAL SERVER ERROR WHILE LOGGING IN.' });
+    }
+  });
 }
