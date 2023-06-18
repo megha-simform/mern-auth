@@ -1,7 +1,7 @@
 import User from '../models/user.js';
 import AccessToken from '../models/accessToken.js';
 import RefreshToken from '../models/refreshToken.js';
-import { createHash } from '../utils/helper.js';
+import { createHash, generateToken, matchPassword } from '../utils/helper.js';
 
 const ACCESS_TOKEN_SECRET_KEY = process.env.ACCESS_TOKEN_SECRET_KEY;
 const REFRESH_TOKEN_SECRET_KEY = process.env.REFRESH_TOKEN_SECRET_KEY;
@@ -164,4 +164,57 @@ export async function postLogout(req, res, next) {
       return res.status(500).json({ error: 'INTERNAL SERVER ERROR WHILE LOGGING IN.' });
     }
   });
+}
+
+/**
+ * Generate a new access token using the provided refresh token.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<Response>} - The response containing the new access token.
+ */
+export async function postRefreshToken(req, res, next) {
+  try {
+    const refreshToken = req.headers['authorization'];
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'Refresh Token not found. Unauthenticated user.' });
+    }
+
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (error, decoded) => {
+      if (error) {
+        return res.status(403).json({ message: 'Refresh token expired. User needs to login again.' });
+      }
+
+      try {
+        const userId = decoded.userId;
+
+        // Check if the refresh token is valid
+        const refreshTokenDetails = await RefreshToken.findOne({ refreshToken: refreshToken }).where({
+          userId: userId,
+        });
+
+        if (!refreshTokenDetails) {
+          return res.status(403).json({ message: 'INVALID REFRESH TOKEN. User needs to login again.' });
+        }
+
+        // Delete any existing access tokens for the user
+        const deleteUnwantedAccessToken = await AccessToken.findOne({ userId: userId });
+        if (deleteUnwantedAccessToken) {
+          await AccessToken.findOneAndDelete({ userId: userId });
+        }
+
+        // Generate a new access token
+        const accessToken = generateToken(userId, ACCESS_TOKEN_SECRET_KEY, accessTokenExpiryTime);
+        await AccessToken.create({ accessToken: accessToken, userId: userId });
+
+        return res.status(200).json({ message: 'Access Token generated.', accessToken: accessToken });
+      } catch (error) {
+        console.log('Error in postRefreshToken jwt verification: ', error);
+      }
+    });
+  } catch (error) {
+    console.log('Error in postRefreshToken: ', error);
+  }
 }
