@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 
+import authRoutes from './routes/auth.js';
+
 const app = express();
 const port = process.env.PORT;
 const mongoDbUri = process.env.MONGODB_URI ?? '';
@@ -11,6 +13,8 @@ const mongoDbUri = process.env.MONGODB_URI ?? '';
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+
+app.use('/auth', authRoutes);
 
 // Connects to the MongoDB database and starts the server at the specified port.
 try {
