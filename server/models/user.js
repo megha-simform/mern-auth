@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
@@ -7,29 +7,29 @@ const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, 'Name is a required field.'],
+      required: [true, "Name is a required field."],
       unique: true,
-      maxLength: [30, 'Name must not have more than 30 characters.'],
-      minLength: [4, 'Name must have more than 4 characters.'],
+      maxLength: [30, "Name must not have more than 30 characters."],
+      minLength: [4, "Name must have more than 4 characters."],
       trim: true,
     },
     email: {
       type: String,
-      required: [true, 'Email is a required field'],
+      required: [true, "Email is a required field"],
       unique: true,
-      match: [/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/, 'Invalid email format'],
+      match: [/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/, "Invalid email format"],
       trim: true,
     },
     password: {
       type: String,
-      required: [true, 'Password is a required field'],
+      required: [true, "Password is a required field"],
       trim: true,
     },
-    gender: {
-      type: String,
-    },
+    // gender: {
+    //   type: String,
+    // },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model("User", userSchema);
