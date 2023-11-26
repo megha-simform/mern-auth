@@ -79,3 +79,34 @@ axiosApi.interceptors.response.use(
     }
   }
 );
+
+const AuthAPIService = {
+  // Google OAuth
+  loginWithGoogle: () => {
+    window.location.href = `${baseURL}/auth/google`;
+  },
+
+  // Facebook OAuth
+  loginWithFacebook: () => {
+    window.location.href = `${baseURL}/auth/facebook`;
+  },
+
+  // Microsoft OAuth
+  loginWithMicrosoft: () => {
+    window.location.href = `${baseURL}/auth/microsoft`;
+  },
+
+  // Callback after OAuth authentication
+  handleAuthentication: () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get("code");
+    if (code) {
+      return axios
+        .post(`${baseURL}/auth/callback`, { code })
+        .then((response) => response.data);
+    }
+    return Promise.reject("Authentication failed");
+  },
+};
+
+export default AuthAPIService;
