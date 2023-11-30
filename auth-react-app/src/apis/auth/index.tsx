@@ -32,7 +32,7 @@ axiosApi.interceptors.response.use(
   (response) => {
     if (response.status === 401) {
       localStorage.clear();
-      window.location.href = baseURL + "login";
+      window.location.href = baseURL + "/login";
     }
     return response;
   },

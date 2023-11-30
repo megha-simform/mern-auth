@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
 import { API_PATHS } from "../../apis/routes/APIRoutes";
 import axios from "axios";
+import AuthAPIService from "../../apis/auth";
 
 const Container = styled.div`
   margin: 20%;
@@ -23,6 +24,18 @@ const SubmitFormItem = styled(Form.Item)`
 const Login = () => {
   const navigate = useNavigate();
   const userAuthData = useContext(AuthContext);
+
+  const handleGoogleLogin = () => {
+    AuthAPIService.loginWithGoogle();
+  };
+
+  const handleFacebookLogin = () => {
+    AuthAPIService.loginWithFacebook();
+  };
+
+  const handleMicrosoftLogin = () => {
+    AuthAPIService.loginWithMicrosoft();
+  };
 
   // login api
   const onFinish = (values: any) => {
@@ -69,6 +82,9 @@ const Login = () => {
           <Button type="primary" htmlType="submit">
             Login
           </Button>
+          <button onClick={handleGoogleLogin}>Login with Google</button>
+          <button onClick={handleFacebookLogin}>Login with Facebook</button>
+          <button onClick={handleMicrosoftLogin}>Login with Microsoft</button>
         </SubmitFormItem>
       </Form>
     </Container>

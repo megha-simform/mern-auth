@@ -1,6 +1,7 @@
 import * as bcrypt from "bcrypt";
 import "dotenv/config";
 import jsonwebtoken from "jsonwebtoken";
+import { randomBytes } from "crypto";
 
 import { saltOrRounds } from "../common/constants.js";
 
@@ -35,4 +36,8 @@ export const generateToken = (userId, secretKey, expiryTime) => {
   return jsonwebtoken.sign({ userId: userId }, secretKey, {
     expiresIn: tokenExpiryTime,
   });
+};
+
+export const generateHelperToken = async () => {
+  return randomBytes(32).toString("hex");
 };

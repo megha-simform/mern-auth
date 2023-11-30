@@ -25,11 +25,23 @@ const userSchema = new Schema(
       required: [true, "Password is a required field"],
       trim: true,
     },
+    resetPasswordToken: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    verifyEmailToken: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     // gender: {
     //   type: String,
     // },
   },
   { timestamps: true }
 );
+
+userSchema.index({ resetPasswordToken: 1 }, { expireAfterSeconds: 3600 });
 
 export default mongoose.model("User", userSchema);

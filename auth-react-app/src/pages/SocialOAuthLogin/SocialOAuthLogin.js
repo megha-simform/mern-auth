@@ -1,7 +1,7 @@
-import React from 'react';
-import AuthService from '../services/AuthService';
+import React from "react";
+import AuthService from "../services/AuthService";
 
-const Login = () => {
+const SocialOAuthLogin = () => {
   const handleGoogleLogin = () => {
     AuthService.loginWithGoogle();
   };
@@ -23,4 +23,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SocialOAuthLogin;
