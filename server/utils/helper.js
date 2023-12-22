@@ -1,8 +1,9 @@
-import * as bcrypt from 'bcrypt';
-import 'dotenv/config';
-import * as jwt from 'jsonwebtoken';
+import * as bcrypt from "bcrypt";
+import "dotenv/config";
+import jsonwebtoken from "jsonwebtoken";
+import { randomBytes } from "crypto";
 
-import { saltOrRounds } from '../common/constants.js';
+import { saltOrRounds } from "../common/constants.js";
 
 /**
  ** Creates a hash of the provided password using bcrypt.
@@ -19,7 +20,8 @@ export const createHash = (password) => bcrypt.hashSync(password, saltOrRounds);
  * @param {string} requestPassword - The password received in the request for comparison.
  * @returns {boolean} Returns true if the passwords match, false otherwise.
  */
-export const matchPassword = (hashedPassword, requestPassword) => bcrypt.compareSync(requestPassword, hashedPassword);
+export const matchPassword = (hashedPassword, requestPassword) =>
+  bcrypt.compareSync(requestPassword, hashedPassword);
 
 /**
  ** Generates a token for a user.
@@ -30,6 +32,12 @@ export const matchPassword = (hashedPassword, requestPassword) => bcrypt.compare
  * @returns {string} The generated token.
  */
 export const generateToken = (userId, secretKey, expiryTime) => {
-  const tokenExpiryTime = expiryTime + 's';
-  return jwt.sign({ userId: userId }, secretKey, { expiresIn: tokenExpiryTime });
+  const tokenExpiryTime = expiryTime + "s";
+  return jsonwebtoken.sign({ userId: userId }, secretKey, {
+    expiresIn: tokenExpiryTime,
+  });
+};
+
+export const generateHelperToken = async () => {
+  return randomBytes(32).toString("hex");
 };
